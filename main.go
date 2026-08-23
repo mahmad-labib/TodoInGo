@@ -10,20 +10,22 @@ import (
 
 func main() {
 	up, down := migrationFlag()
-	conn, msg, err := db.InitDB()
+	client, msg, err := db.NewClient("./myApp.db")
 	if err != nil {
-		conn.Close()
+		if client.DB != nil {
+			client.DB.Close()
+		}
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	defer conn.Close()
+	defer client.DB.Close()
 	if up {
-		result, err := db.MigrateUp(conn)
+		result, err := db.MigrateUp(client.DB)
 		handleErr(err)
 		msg = append(msg, result)
 	}
 	if down {
-		result, err := db.MigrateDown(conn)
+		result, err := db.MigrateDown(client.DB)
 		handleErr(err)
 		msg = append(msg, result)
 	}
@@ -44,9 +46,12 @@ func handleErr(err error) {
 }
 
 func migrationFlag() (bool, bool) {
-	migrationFlag := flag.NewFlagSet("migration", flag.ExitOnError)
-	up := migrationFlag.Bool("up", false, "setup DB table")
-	down := migrationFlag.Bool("down", false, "setup DB table")
-	migrationFlag.Parse(os.Args[2:])
-	return *up, *down
+	if len(os.Args[:]) > 2 {
+		migrationFlag := flag.NewFlagSet("migration", flag.ExitOnError)
+		up := migrationFlag.Bool("up", false, "setup DB table")
+		down := migrationFlag.Bool("down", false, "setup DB table")
+		migrationFlag.Parse(os.Args[2:])
+		return *up, *down
+	}
+	return false, false
 }

@@ -16,24 +16,34 @@ import (
 //go:embed migrations/*.sql
 var migrationFiles embed.FS
 
-func InitDB() (*sql.DB, []string, error) {
+// Client wraps sql.DB
+type Client struct {
+	DB *sql.DB
+}
+
+func NewClient(dsn string) (*Client, []string, error) {
+	if dsn == "" {
+		return nil, nil, errors.New("DSN cannot be empty")
+	}
 	var msg []string
-	db, err := sql.Open("sqlite", "todo.db")
+	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
-		return db, msg, fmt.Errorf("open database : %w", err)
+		return nil, msg, fmt.Errorf("open database : %w", err)
 	}
 
 	pingErr := db.Ping()
 	if pingErr != nil {
 		err = fmt.Errorf("ping database: %w", pingErr)
+		return nil, msg, err
 	} else {
 		msg = append(msg, "connection established succesfully")
-		result, migErr := MigrateUp(db)
-		msg = append(msg, result)
-		err = errors.Join(err, migErr)
+		// not sure should migration start with connection or with specific command only!!
+		// result, migErr := MigrateUp(db)
+		// msg = append(msg, result)
+		// err = errors.Join(err, migErr)
 	}
 
-	return db, msg, err
+	return &Client{DB: db}, msg, nil
 }
 
 func MigrateUp(db *sql.DB) (string, error) {
@@ -49,13 +59,13 @@ func MigrateUp(db *sql.DB) (string, error) {
 		return msg, fmt.Errorf("initialize migration provider: %w", err)
 	}
 	result, err := provider.Up(ctx)
-	if result != nil {
-		msg += "create_todo_table"
+	for _, rs := range result {
+		msg += rs.String()
 	}
 	if err != nil {
 		return msg, fmt.Errorf("in migration up: %w", err)
 	}
-	return msg, err
+	return msg, nil
 }
 
 func MigrateDown(db *sql.DB) (string, error) {
@@ -72,10 +82,10 @@ func MigrateDown(db *sql.DB) (string, error) {
 	}
 	result, err := provider.Down(ctx)
 	if result != nil {
-		msg += "drop_todo_table"
+		msg += result.String()
 	}
 	if err != nil {
 		return msg, fmt.Errorf("in migration down: %w", err)
 	}
-	return msg, err
+	return msg, nil
 }
