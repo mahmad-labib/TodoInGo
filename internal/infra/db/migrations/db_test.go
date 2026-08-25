@@ -1,26 +1,26 @@
 package db
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 )
 
 // TestNewClient_Success tests valid connection creation
 func TestNewClient_Success(t *testing.T) {
 	// Use in-memory SQLite for tests
-	client, msg, err := NewClient(":memory:")
+	client, err := db.NewClient(":memory:")
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 	defer client.DB.Close()
-	fmt.Println(msg)
 	if client.DB == nil {
 		t.Fatal("expected DB instance to not be nil")
 	}
 }
 
 func TestNewClient_EmptyDSN(t *testing.T) {
-	client, _, err := NewClient("")
+	client, err := db.NewClient("")
 	if err == nil {
 		t.Fatal("expected error for empty dsn, got nil")
 	}
@@ -30,13 +30,13 @@ func TestNewClient_EmptyDSN(t *testing.T) {
 }
 
 func Test_Migration(t *testing.T) {
-	client, _, err := NewClient(":memory:")
+	client, err := db.NewClient(":memory:")
 	if err != nil {
 		t.Fatalf("migration setup expected no error, got: %v", err)
 	}
 	defer client.DB.Close()
 
-	msg, err := MigrateUp(client.DB)
+	msg, err := db.MigrateUp(client.DB)
 
 	if err != nil {
 		t.Fatalf("migration failed: %v", err)
@@ -58,7 +58,7 @@ func Test_Migration(t *testing.T) {
 		t.Fatalf("expected todo table got: %s", tableName)
 	}
 
-	msg, err = MigrateDown(client.DB)
+	msg, err = db.MigrateDown(client.DB)
 
 	if err != nil {
 		t.Fatalf("migration Down failed: %v", err)
