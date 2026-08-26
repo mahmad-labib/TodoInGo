@@ -1,40 +1,55 @@
 package main
 
 import (
-	"fmt"
+	"log/slog"
 	"os"
+	"path/filepath"
 
+	"github.com/joho/godotenv"
 	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 )
 
 func main() {
-	client, err := db.NewClient("./myApp.db")
-	if err != nil {
-		handleErr(err)
+	//should i use autoload ?
+	if err := godotenv.Load(); err != nil {
+		slog.Warn("No .env file found, will use default values")
 	}
+	dbName := os.Getenv("DB_NAME")
+	dbPath := os.Getenv("DB_PATH")
+	if dbName == "" {
+		dbName = "myApp.db"
+	}
+	if dbPath == "" {
+		dbPath = "."
+	}
+	defaultPath := filepath.Join(dbPath, dbName)
+	client, err := db.NewClient(defaultPath)
+	handleErr(err)
 	defer client.DB.Close()
-	fmt.Println("connection established successfully")
+	handleResult("connection established successfully")
 	up, down := migrationFlag()
 	if up {
 		result, err := db.MigrateUp(client.DB)
 		handleErr(err)
-		if result != "" {
-			fmt.Println(result)
-		}
+		handleResult(result)
 	}
 	if down {
 		result, err := db.MigrateDown(client.DB)
 		handleErr(err)
-		if result != "" {
-			fmt.Println(result)
-		}
+		handleResult(result)
 	}
 }
 
 func handleErr(err error) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		slog.Error(err.Error())
 		os.Exit(1)
+	}
+}
+
+func handleResult(result string) {
+	if result != "" {
+		slog.Info(result)
 	}
 }
 
