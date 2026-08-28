@@ -17,6 +17,7 @@ func NewClient(dsn string) (*Client, error) {
 	if dsn == "" {
 		return nil, errors.New("DSN cannot be empty")
 	}
+
 	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("open database : %w", err)

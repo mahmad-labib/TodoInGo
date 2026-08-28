@@ -10,31 +10,20 @@ import (
 )
 
 func main() {
-	//should i use autoload ?
-	if err := godotenv.Load(); err != nil {
-		slog.Warn("No .env file found, will use default values")
-	}
-	dbName := os.Getenv("DB_NAME")
-	dbPath := os.Getenv("DB_PATH")
-	if dbName == "" {
-		dbName = "myApp.db"
-	}
-	if dbPath == "" {
-		dbPath = "."
-	}
-	defaultPath := filepath.Join(dbPath, dbName)
+	defaultPath := getDBFile()
+
 	client, err := db.NewClient(defaultPath)
 	handleErr(err)
 	defer client.DB.Close()
 	handleResult("connection established successfully")
-	up, down := migrationFlag()
-	if up {
-		result, err := db.MigrateUp(client.DB)
+
+	rollback := checkMigrationStatus()
+	if rollback {
+		result, err := db.MigrateDown(client.DB)
 		handleErr(err)
 		handleResult(result)
-	}
-	if down {
-		result, err := db.MigrateDown(client.DB)
+	} else {
+		result, err := db.MigrateUp(client.DB)
 		handleErr(err)
 		handleResult(result)
 	}
@@ -53,13 +42,32 @@ func handleResult(result string) {
 	}
 }
 
-func migrationFlag() (bool, bool) {
+func checkMigrationStatus() bool {
 	if len(os.Args) > 1 {
 		for _, v := range os.Args[1:] {
 			if v == "rollback" {
-				return false, true
+				return true
 			}
 		}
 	}
-	return true, false
+	return false
+}
+
+func getDBFile() string {
+	if err := godotenv.Load(); err != nil {
+		slog.Warn("No .env file found, will use default values")
+	}
+
+	dbName := os.Getenv("DB_NAME")
+	dbPath := os.Getenv("DB_PATH")
+
+	if dbName == "" {
+		dbName = "myApp.db"
+	}
+	if dbPath == "" {
+		dbPath = "."
+	}
+
+	defaultPath := filepath.Join(dbPath, dbName)
+	return defaultPath
 }
