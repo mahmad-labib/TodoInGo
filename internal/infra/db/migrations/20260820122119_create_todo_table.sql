@@ -4,7 +4,7 @@
         title TEXT UNIQUE NOT NULL,
 		status TEXT DEFAULT 'inProgress',
 		priority TEXT NOT NULL,
-		created_at DATE DEFAULT CURRENT_DATE
+		created_at DATE DEFAULT DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 -- +goose Down
 DROP TABLE todo;
