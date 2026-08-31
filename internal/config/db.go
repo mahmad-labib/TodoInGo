@@ -3,26 +3,20 @@ package config
 import (
 	"log/slog"
 	"os"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
+	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 )
 
-func GetDBFile() string {
+func GetDBFile() *db.DB {
 	if err := godotenv.Load(); err != nil {
 		slog.Warn("No .env file found, will use default values")
 	}
 
-	dbName := os.Getenv("DB_NAME")
-	dbPath := os.Getenv("DB_PATH")
-
-	if dbName == "" {
-		dbName = "myApp.db"
-	}
-	if dbPath == "" {
-		dbPath = "."
+	cfg := db.DB{
+		DBName: os.Getenv("DB_NAME"),
+		DBPath: os.Getenv("DB_PATH"),
 	}
 
-	defaultPath := filepath.Join(dbPath, dbName)
-	return defaultPath
+	return &cfg
 }

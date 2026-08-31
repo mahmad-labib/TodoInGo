@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	_ "modernc.org/sqlite"
 )
@@ -11,6 +12,11 @@ import (
 // Client wraps sql.DB
 type Client struct {
 	DB *sql.DB
+}
+
+type DB struct {
+	DBName string
+	DBPath string
 }
 
 func NewClient(dsn string) (*Client, error) {
@@ -30,4 +36,14 @@ func NewClient(dsn string) (*Client, error) {
 	}
 
 	return &Client{DB: db}, nil
+}
+
+func ResolveFilePath(cfg *DB) string {
+	if cfg.DBName == "" {
+		cfg.DBName = "myApp.db"
+	}
+	if cfg.DBPath == "" {
+		cfg.DBPath = "."
+	}
+	return filepath.Join(cfg.DBPath, cfg.DBName)
 }
