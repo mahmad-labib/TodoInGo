@@ -9,7 +9,11 @@ import (
 )
 
 func main() {
-	defaultPath := config.GetDBFile()
+	cfg, err := config.New()
+	if err != nil {
+		slog.Error("Failed to load config", "err: ", err)
+	}
+	defaultPath := db.ResolveFilePath(&cfg.DB)
 
 	client, err := db.NewClient(defaultPath)
 	handleErr(err)
