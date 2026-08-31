@@ -1,22 +1,17 @@
 package config
 
 import (
-	"log/slog"
 	"os"
-
-	"github.com/joho/godotenv"
-	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 )
 
-func GetDBFile() *db.DB {
-	if err := godotenv.Load(); err != nil {
-		slog.Warn("No .env file found, will use default values")
-	}
+type DB struct {
+	Name string
+	Path string
+}
 
-	cfg := db.DB{
-		DBName: os.Getenv("DB_NAME"),
-		DBPath: os.Getenv("DB_PATH"),
+func NewDB() DB {
+	return DB{
+		Name: os.Getenv("DB_NAME"),
+		Path: os.Getenv("DB_PATH"),
 	}
-
-	return &cfg
 }

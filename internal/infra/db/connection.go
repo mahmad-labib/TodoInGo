@@ -6,17 +6,13 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/mahmad-labib/TodoInGo/internal/config"
 	_ "modernc.org/sqlite"
 )
 
 // Client wraps sql.DB
 type Client struct {
 	DB *sql.DB
-}
-
-type DB struct {
-	DBName string
-	DBPath string
 }
 
 func NewClient(dsn string) (*Client, error) {
@@ -38,12 +34,16 @@ func NewClient(dsn string) (*Client, error) {
 	return &Client{DB: db}, nil
 }
 
-func ResolveFilePath(cfg *DB) string {
-	if cfg.DBName == "" {
-		cfg.DBName = "myApp.db"
+func ResolveFilePath(cfg *config.DB) string {
+	name := cfg.Name
+	path := cfg.Path
+
+	if name == "" {
+		name = "myApp.db"
 	}
-	if cfg.DBPath == "" {
-		cfg.DBPath = "."
+	if path == "" {
+		path = "."
 	}
-	return filepath.Join(cfg.DBPath, cfg.DBName)
+
+	return filepath.Join(cfg.Path, cfg.Name)
 }
