@@ -20,10 +20,9 @@ func TestAddTodo_success(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: "todo"}
 	priority := service.Priority{Name: "high"}
-	id, err := db.TodoCreate(ctx, client.DB, "Todo", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "Todo", priority.Name, status.Name)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
@@ -39,10 +38,9 @@ func TestAddTodo_EmptyTitle(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: "todo"}
 	priority := service.Priority{Name: "high"}
-	id, err := db.TodoCreate(ctx, client.DB, "", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "", priority.Name, status.Name)
 	if err == nil {
 		t.Fatal("expected Error, got no error")
 	}
@@ -58,17 +56,16 @@ func TestAddTodo_UniqueTitle(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: "todo"}
 	priority := service.Priority{Name: "high"}
-	id, err := db.TodoCreate(ctx, client.DB, "title", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "title", priority.Name, status.Name)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 	if id == 0 {
 		t.Fatal("expected returned ID, got nil")
 	}
-	id, err = db.TodoCreate(ctx, client.DB, "title", priority.Name, status.Name)
+	id, err = db.TodoCreate(client.DB, "title", priority.Name, status.Name)
 	if err == nil {
 		t.Fatal("expected Error, got no error")
 	}
@@ -84,10 +81,9 @@ func TestAddTodo_EmptyPriority(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: "todo"}
 	priority := service.Priority{}
-	id, err := db.TodoCreate(ctx, client.DB, "title", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "title", priority.Name, status.Name)
 	if err == nil {
 		t.Fatal("expected Error, got no error")
 	}
@@ -103,10 +99,9 @@ func TestAddTodo_EmptyStatus(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: ""}
 	priority := service.Priority{Name: "high"}
-	id, err := db.TodoCreate(ctx, client.DB, "title", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "title", priority.Name, status.Name)
 
 	if err != nil {
 		t.Fatalf("expected no Error, got: %v", err)
@@ -123,10 +118,9 @@ func TestAddTodo_InvalidPriority(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: "todo"}
 	priority := service.Priority{Name: "severe"}
-	id, err := db.TodoCreate(ctx, client.DB, "title", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "title", priority.Name, status.Name)
 
 	if err == nil {
 		t.Fatal("expected Error, got no Error")
@@ -143,10 +137,9 @@ func TestAddTodo_InvalidStatus(t *testing.T) {
 	}
 	defer client.DB.Close()
 
-	ctx := t.Context()
 	status := service.Status{Name: "will do"}
 	priority := service.Priority{Name: "high"}
-	id, err := db.TodoCreate(ctx, client.DB, "title", priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, "title", priority.Name, status.Name)
 
 	if err != nil {
 		t.Fatalf("expected no Error, got: %v", err)

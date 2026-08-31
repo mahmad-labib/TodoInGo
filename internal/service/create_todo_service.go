@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"slices"
@@ -38,7 +37,7 @@ func (S Status) validate() bool {
 	return true
 }
 
-func CreateTodoService(ctx context.Context, client db.Client, title string, priority Priority, status Status) (int64, error) {
+func CreateTodoService(client db.Client, title string, priority Priority, status Status) (int64, error) {
 	if title == "" {
 		err := fmt.Errorf("title should not be empty")
 		return 0, err
@@ -54,6 +53,6 @@ func CreateTodoService(ctx context.Context, client db.Client, title string, prio
 		status.Name = "todo"
 		slog.Warn("status's value is not valid, default value -> 'todo' will be applied")
 	}
-	id, err := db.TodoCreate(ctx, client.DB, title, priority.Name, status.Name)
+	id, err := db.TodoCreate(client.DB, title, priority.Name, status.Name)
 	return id, err
 }
