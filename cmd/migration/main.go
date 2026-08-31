@@ -14,19 +14,21 @@ func main() {
 		slog.Error("Failed to load config", "err: ", err)
 	}
 	defaultPath := db.ResolveFilePath(&cfg.DB)
-
 	client, err := db.NewClient(defaultPath)
 	handleErr(err)
-	defer client.DB.Close()
 	handleResult("connection established successfully")
 
 	rollback := checkMigrationStatus()
 	if rollback {
-		result, err := db.MigrateDown(client.DB)
+		sqliteDB, err := client.DB.DB()
+		handleErr(err)
+		result, err := db.MigrateDown(sqliteDB)
 		handleErr(err)
 		handleResult(result)
 	} else {
-		result, err := db.MigrateUp(client.DB)
+		sqliteDB, err := client.DB.DB()
+		handleErr(err)
+		result, err := db.MigrateUp(sqliteDB)
 		handleErr(err)
 		handleResult(result)
 	}
