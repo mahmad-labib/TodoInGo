@@ -4,7 +4,7 @@
         title TEXT UNIQUE NOT NULL,
 		status TEXT DEFAULT 'todo',
 		priority TEXT NOT NULL,
-		created_at DATE DEFAULT DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 -- +goose Down
 DROP TABLE todo;

@@ -6,7 +6,6 @@ import (
 	"slices"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
-	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 )
 
 type todoValidate struct {
@@ -45,10 +44,8 @@ func validateStatus(t *todoValidate) {
 	}
 }
 
-func CreateTodoService(client db.Client, Todo *domain.Todo) (uint, error) {
+func CreateTodoService(Todo *domain.Todo) error {
 	TodoWithValidation := todoValidate{Todo: Todo}
-	TodoWithValidation.validate()
-	TodoGormRepo := db.NewTodoGormRepo(client.DB)
-	id, err := TodoGormRepo.Create(Todo)
-	return id, err
+	err := TodoWithValidation.validate()
+	return err
 }

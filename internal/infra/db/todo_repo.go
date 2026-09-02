@@ -12,7 +12,7 @@ type TodoGormRepo struct {
 	db *gorm.DB
 }
 
-func NewTodoGormRepo(db *gorm.DB) *TodoGormRepo {
+func NewTodoRepo(db *gorm.DB) *TodoGormRepo {
 	return &TodoGormRepo{db: db}
 }
 
