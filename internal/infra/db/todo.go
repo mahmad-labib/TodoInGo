@@ -4,20 +4,20 @@ import (
 	"fmt"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
-	"github.com/mahmad-labib/TodoInGo/internal/infra/db/models"
+	"github.com/mahmad-labib/TodoInGo/internal/infra/db/model"
 	"gorm.io/gorm"
 )
 
-type TodoGormRepo struct {
+type Todo struct {
 	db *gorm.DB
 }
 
-func NewTodoRepo(db *gorm.DB) *TodoGormRepo {
-	return &TodoGormRepo{db: db}
+func NewTodo(db *gorm.DB) *Todo {
+	return &Todo{db: db}
 }
 
-func (r *TodoGormRepo) Create(todo *domain.Todo) (uint, error) {
-	dbTodo := models.TodoModel{
+func (r *Todo) Create(todo *domain.Todo) (uint, error) {
+	dbTodo := model.Todo{
 		Title:    todo.Title,
 		Status:   todo.Status,
 		Priority: todo.Priority,
