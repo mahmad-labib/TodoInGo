@@ -12,12 +12,12 @@ func HandleCmd(client *db.Client) (uint, error) {
 	TodoRepo := db.NewTodoRepo(client.DB)
 
 	Todo := GetCmdFlags()
-	err := service.CreateTodoService(Todo)
+	validatedTodo, err := service.CreateTodoService(Todo)
 	if err != nil {
 		return 0, err
 	}
 
-	id, err := TodoRepo.Create(Todo)
+	id, err := TodoRepo.Create(validatedTodo.Todo)
 	return id, err
 }
 

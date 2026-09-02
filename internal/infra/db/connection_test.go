@@ -13,7 +13,6 @@ func TestNewClient_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
-	defer client.DB.Close()
 	if client.DB == nil {
 		t.Fatal("expected DB instance to not be nil")
 	}

@@ -12,21 +12,19 @@ type todoValidate struct {
 	Todo *domain.Todo
 }
 
-func (t todoValidate) validate() error {
+func (t todoValidate) validate() (*todoValidate, error) {
 	if t.Todo.Title == "" {
 		err := fmt.Errorf("title should not be empty")
-		return err
+		return nil, err
 	}
 	err := validatePriority(&t)
 	validateStatus(&t)
-
-	return err
+	return &t, err
 }
 
 func validatePriority(t *todoValidate) error {
 	if t.Todo.Priority == "" {
-		err := fmt.Errorf("priority value should be only 'high', 'normal' or 'low' got nil")
-		return err
+		return fmt.Errorf("priority value should be only 'high', 'normal' or 'low' got nil")
 	}
 	priorities := []string{"high", "normal", "low"}
 	if exist := slices.Contains(priorities, t.Todo.Priority); exist == false {
@@ -44,8 +42,8 @@ func validateStatus(t *todoValidate) {
 	}
 }
 
-func CreateTodoService(Todo *domain.Todo) error {
+func CreateTodoService(Todo *domain.Todo) (*todoValidate, error) {
 	TodoWithValidation := todoValidate{Todo: Todo}
-	err := TodoWithValidation.validate()
-	return err
+	validatedTodo, err := TodoWithValidation.validate()
+	return validatedTodo, err
 }
