@@ -3,15 +3,16 @@ package db_test
 import (
 	"testing"
 
+	"github.com/mahmad-labib/TodoInGo/internal/config"
 	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 )
 
 func Test_Migration(t *testing.T) {
-	client, err := db.NewClient(":memory:")
+	client, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
 		t.Fatalf("migration setup expected no error, got: %v", err)
 	}
-	sqliteDB, err := client.DB.DB()
+	sqliteDB, err := client.DB()
 	if err != nil {
 		t.Fatalf("fetching sqliteDB expected no error, got: %v", err)
 	}
