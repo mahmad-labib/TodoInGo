@@ -3,14 +3,16 @@ package service_test
 import (
 	"testing"
 
+	"github.com/mahmad-labib/TodoInGo/internal/config"
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
 	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 	service "github.com/mahmad-labib/TodoInGo/internal/service/validations"
+	"gorm.io/gorm"
 )
 
-func returnClient() (*db.Client, error) {
-	client, err := db.NewClient(":memory:")
-	sqliteDB, err := client.DB.DB()
+func returnClient() (*gorm.DB, error) {
+	client, err := db.NewClient(&config.DB{Name: "test"})
+	sqliteDB, err := client.DB()
 	if err != nil {
 		return client, err
 	}
@@ -20,7 +22,7 @@ func returnClient() (*db.Client, error) {
 
 func TestAddTodo_success(t *testing.T) {
 	client, err := returnClient()
-	TodoRepo := db.NewTodoRepo(client.DB)
+	TodoRepo := db.NewTodo(client)
 
 	Todo := domain.Todo{
 		Title:    "Test",
@@ -60,7 +62,7 @@ func TestAddTodo_UniqueTitle(t *testing.T) {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 
-	TodoRepo := db.NewTodoRepo(client.DB)
+	TodoRepo := db.NewTodo(client)
 
 	Todo := domain.Todo{
 		Title:    "Test",
@@ -110,7 +112,7 @@ func TestAddTodo_EmptyStatus(t *testing.T) {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 
-	TodoRepo := db.NewTodoRepo(client.DB)
+	TodoRepo := db.NewTodo(client)
 
 	Todo := domain.Todo{
 		Title:    "Test",
@@ -152,7 +154,7 @@ func TestAddTodo_InvalidStatus(t *testing.T) {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 
-	TodoRepo := db.NewTodoRepo(client.DB)
+	TodoRepo := db.NewTodo(client)
 
 	Todo := domain.Todo{
 		Title:    "Test",

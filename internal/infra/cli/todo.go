@@ -6,10 +6,11 @@ import (
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
 	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
 	service "github.com/mahmad-labib/TodoInGo/internal/service/validations"
+	"gorm.io/gorm"
 )
 
-func HandleCmd(client *db.Client) (uint, error) {
-	TodoRepo := db.NewTodoRepo(client.DB)
+func HandleCmd(client *gorm.DB) (uint, error) {
+	TodoRepo := db.NewTodo(client)
 
 	Todo := GetCmdFlags()
 	validatedTodo, err := service.CreateTodoService(Todo)
