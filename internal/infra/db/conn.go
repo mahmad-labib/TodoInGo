@@ -29,5 +29,6 @@ func resolveFilePath(cfg *config.DB) string {
 	if cfg.Name == "test" {
 		return ":memory:"
 	}
+
 	return filepath.Join(cfg.Path, cfg.Name)
 }

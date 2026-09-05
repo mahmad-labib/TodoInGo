@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
@@ -16,11 +17,11 @@ func NewTodo(db *gorm.DB) *Todo {
 	return &Todo{db: db}
 }
 
-func (r *Todo) Create(todo *domain.Todo) (uint, error) {
+func (r *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 	dbTodo := model.Todo{
-		Title:    todo.Title,
-		Status:   todo.Status,
-		Priority: todo.Priority,
+		Title:    item.Title,
+		Status:   item.Status,
+		Priority: item.Priority,
 	}
 
 	result := r.db.Create(&dbTodo)
@@ -29,6 +30,5 @@ func (r *Todo) Create(todo *domain.Todo) (uint, error) {
 		return 0, err
 	}
 
-	todo.ID = dbTodo.ID
-	return todo.ID, nil
+	return dbTodo.ID, nil
 }
