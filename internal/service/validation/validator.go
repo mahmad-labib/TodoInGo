@@ -3,6 +3,7 @@ package validation
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
 )
@@ -18,7 +19,9 @@ func (v *Validator) Validate(item *domain.Todo) error {
 
 	err2 := v.validateStatus(item.Status)
 
-	return errors.Join(err1, err2)
+	err3 := v.validatePriority(item.Priority)
+
+	return errors.Join(err1, err2, err3)
 }
 
 func (v *Validator) validateTitle(title string) error {
@@ -34,9 +37,28 @@ func (v *Validator) validateTitle(title string) error {
 }
 
 func (v *Validator) validateStatus(status string) error {
+	statuses := []string{"todo", "inProgress", "done"}
+
 	if status == "" {
 		return fmt.Errorf("status cannot be empty")
 	}
 
+	if !slices.Contains(statuses, status) {
+		return fmt.Errorf("status value should be todo, inProgress or done")
+	}
+
 	return nil
+}
+func (v *Validator) validatePriority(priority string) error {
+	priorities := []string{"high", "normal", "low"}
+
+	if priority == "" {
+		return fmt.Errorf("priority cant be empty, value should be high, normal or low")
+	}
+
+	if slices.Contains(priorities, priority) {
+		return nil
+	}
+
+	return fmt.Errorf("priority should be high, normal or low")
 }

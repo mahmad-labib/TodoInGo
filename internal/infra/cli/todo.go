@@ -2,8 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
 	"os"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
@@ -57,8 +55,6 @@ func (c *Todo) Run(ctx context.Context) error {
 	}
 
 	if err := cmd.Run(ctx, os.Args); err != nil {
-		slog.Error(fmt.Sprintf("Error executing command %v", err))
-
 		return err
 	}
 
