@@ -5,14 +5,13 @@ import (
 	"os"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
-	"github.com/mahmad-labib/TodoInGo/internal/infra/db/model"
 	validation "github.com/urfave/cli-validation"
 	"github.com/urfave/cli/v3"
 )
 
 type TodoService interface {
 	Create(ctx context.Context, item *domain.Todo) (uint, error)
-	List(ctx context.Context, list *domain.List) ([]model.Todo, error)
+	List(ctx context.Context, sort *domain.Sort) (domain.List, error)
 }
 
 type Todo struct {

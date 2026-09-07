@@ -33,9 +33,9 @@ func (r *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 	return dbTodo.ID, nil
 }
 
-func (r *Todo) List(ctx context.Context, list *domain.List) ([]model.Todo, error) {
+func (r *Todo) List(ctx context.Context, sort *domain.Sort) ([]model.Todo, error) {
 	var todosList []model.Todo
-	err := r.db.Select("id", "title", "status", "priority", "created_at").Order(list.Sort).Find(&todosList).Error
+	err := r.db.Select("id", "title", "status", "priority", "created_at").Order(sort).Find(&todosList).Error
 	if err != nil {
 		return nil, err
 	}

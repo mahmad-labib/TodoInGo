@@ -9,7 +9,7 @@ import (
 
 type TodoRepository interface {
 	Create(ctx context.Context, todo *domain.Todo) (uint, error)
-	List(ctx context.Context, list *domain.List) ([]model.Todo, error)
+	List(ctx context.Context, sort *domain.Sort) ([]model.Todo, error)
 }
 
 type TodoValidator interface {
@@ -33,7 +33,10 @@ func (s *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 	return s.repo.Create(ctx, item)
 }
 
-func (s *Todo) List(ctx context.Context, list *domain.List) ([]model.Todo, error) {
-	todosList, err := s.repo.List(ctx, list)
-	return todosList, err
+func (s *Todo) List(ctx context.Context, sort *domain.Sort) (domain.List, error) {
+	sortedList, err := s.repo.List(ctx, sort)
+	List := domain.List{
+		Data: sortedList,
+	}
+	return List, err
 }

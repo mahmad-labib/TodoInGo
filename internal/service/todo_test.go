@@ -117,14 +117,14 @@ func TestGetTodoList_Populated(t *testing.T) {
 		t.Fatal("expected id got no id")
 	}
 
-	sort := &domain.List{
+	sort := &domain.Sort{
 		Sort: "title",
 	}
 	List, err := service.List(ctx, sort)
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
-	if len(List) == 0 {
+	if len(List.Data) == 0 {
 		t.Fatal("expected a list got nil")
 	}
 
@@ -149,14 +149,14 @@ func TestGetTodoList_Empty(t *testing.T) {
 	service := NewTodo(repo, validator)
 	ctx := context.Background()
 
-	sort := &domain.List{
+	sort := &domain.Sort{
 		Sort: "title",
 	}
 	List, err := service.List(ctx, sort)
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
-	if len(List) > 0 {
+	if len(List.Data) > 0 {
 		t.Fatalf("expected nil got: %v", List)
 	}
 
