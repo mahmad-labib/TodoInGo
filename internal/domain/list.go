@@ -1,11 +1,11 @@
 package domain
 
-import "github.com/mahmad-labib/TodoInGo/internal/infra/db/model"
+import "time"
 
-type Sort struct {
-	Sort string
-}
-
-type List struct {
-	Data []model.Todo
+type TodoList struct {
+	ID        uint
+	Title     string
+	Status    string
+	Priority  string
+	CreatedAt time.Time
 }

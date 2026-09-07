@@ -11,7 +11,7 @@ import (
 
 type TodoService interface {
 	Create(ctx context.Context, item *domain.Todo) (uint, error)
-	List(ctx context.Context, sort *domain.Sort) (domain.List, error)
+	List(ctx context.Context, sort string) (*[]domain.TodoList, error)
 }
 
 type Todo struct {
@@ -65,8 +65,7 @@ func (c *Todo) Run(ctx context.Context) error {
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					c.listAction(ctx, cmd)
-					return nil
+					return c.listAction(ctx, cmd)
 				},
 			},
 		},

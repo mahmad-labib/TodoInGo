@@ -26,13 +26,13 @@ func TestDBClient(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error go %v", err)
 	}
+
 	db.MigrateUp(DB)
 
 	validator := validation.New()
-
 	repo := db.NewTodo(dbClient)
-
 	service := NewTodo(repo, validator)
+
 	ctx := context.Background()
 
 	id, err := service.Create(ctx, &Todo)
@@ -62,13 +62,13 @@ func TestDBClient_TestValidation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error go %v", err)
 	}
+
 	db.MigrateUp(DB)
 
 	validator := validation.New()
-
 	repo := db.NewTodo(dbClient)
-
 	service := NewTodo(repo, validator)
+
 	ctx := context.Background()
 
 	id, err := service.Create(ctx, &Todo)
@@ -98,13 +98,13 @@ func TestGetTodoList_Populated(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error go %v", err)
 	}
+
 	db.MigrateUp(DB)
 
 	validator := validation.New()
-
 	repo := db.NewTodo(dbClient)
-
 	service := NewTodo(repo, validator)
+
 	ctx := context.Background()
 
 	id, err := service.Create(ctx, &Todo)
@@ -117,14 +117,12 @@ func TestGetTodoList_Populated(t *testing.T) {
 		t.Fatal("expected id got no id")
 	}
 
-	sort := &domain.Sort{
-		Sort: "title",
-	}
+	sort := "title"
 	List, err := service.List(ctx, sort)
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
-	if len(List.Data) == 0 {
+	if len(*List) == 0 {
 		t.Fatal("expected a list got nil")
 	}
 
@@ -140,23 +138,22 @@ func TestGetTodoList_Empty(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error go %v", err)
 	}
+
 	db.MigrateUp(DB)
 
 	validator := validation.New()
-
 	repo := db.NewTodo(dbClient)
-
 	service := NewTodo(repo, validator)
+
 	ctx := context.Background()
 
-	sort := &domain.Sort{
-		Sort: "title",
-	}
+	sort := "title"
 	List, err := service.List(ctx, sort)
+
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
-	if len(List.Data) > 0 {
+	if len(*List) > 0 {
 		t.Fatalf("expected nil got: %v", List)
 	}
 

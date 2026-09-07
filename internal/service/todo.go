@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
-	"github.com/mahmad-labib/TodoInGo/internal/infra/db/model"
 )
 
 type TodoRepository interface {
 	Create(ctx context.Context, todo *domain.Todo) (uint, error)
-	List(ctx context.Context, sort *domain.Sort) ([]model.Todo, error)
+	List(ctx context.Context, sort string) (*[]domain.TodoList, error)
 }
 
 type TodoValidator interface {
@@ -33,10 +32,11 @@ func (s *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 	return s.repo.Create(ctx, item)
 }
 
-func (s *Todo) List(ctx context.Context, sort *domain.Sort) (domain.List, error) {
+func (s *Todo) List(ctx context.Context, sort string) (*[]domain.TodoList, error) {
 	sortedList, err := s.repo.List(ctx, sort)
-	List := domain.List{
-		Data: sortedList,
+	if err != nil {
+		return nil, err
 	}
-	return List, err
+
+	return sortedList, err
 }

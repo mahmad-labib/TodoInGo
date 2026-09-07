@@ -33,12 +33,11 @@ func MigrateUp(db *sql.DB) (string, error) {
 
 	result, err := provider.Up(ctx)
 
-	for _, rs := range result {
-		msg += rs.String()
-	}
-
 	if err != nil {
 		return msg, fmt.Errorf("in migration up: %w", err)
+	}
+	for _, rs := range result {
+		msg += rs.String()
 	}
 
 	return msg, nil
@@ -61,6 +60,7 @@ func MigrateDown(db *sql.DB) (string, error) {
 	}
 
 	result, err := provider.Down(ctx)
+
 	if result != nil {
 		msg += result.String()
 	}
