@@ -3,71 +3,86 @@ package main
 import (
 	"log/slog"
 	"os"
-	"path/filepath"
+	"slices"
 
-	"github.com/joho/godotenv"
+	"github.com/mahmad-labib/TodoInGo/internal/config"
 	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
+	"gorm.io/gorm"
 )
 
 func main() {
-	defaultPath := getDBFile()
-
-	client, err := db.NewClient(defaultPath)
-	handleErr(err)
-	defer client.DB.Close()
-	handleResult("connection established successfully")
-
-	rollback := checkMigrationStatus()
-	if rollback {
-		result, err := db.MigrateDown(client.DB)
-		handleErr(err)
-		handleResult(result)
-	} else {
-		result, err := db.MigrateUp(client.DB)
-		handleErr(err)
-		handleResult(result)
-	}
-}
-
-func handleErr(err error) {
+	cfg, err := config.New()
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error("Failed to load config", "err: ", err)
+
 		os.Exit(1)
 	}
-}
 
-func handleResult(result string) {
-	if result != "" {
-		slog.Info(result)
+	client, err := db.NewClient(&cfg.DB)
+	if err != nil {
+		slog.Error(err.Error())
+
+		os.Exit(1)
 	}
+
+	status := checkMigrationStatus()
+	if status == "rollback" {
+		err := migrationDown(client)
+		if err != nil {
+			slog.Error(err.Error())
+
+			os.Exit(1)
+		}
+
+		slog.Info("Rollback successful")
+
+		return
+	}
+
+	err = migrationUp(client)
+	if err != nil {
+		slog.Error(err.Error())
+
+		os.Exit(1)
+	}
+
+	slog.Info("Migration successful")
 }
 
-func checkMigrationStatus() bool {
+func migrationDown(client *gorm.DB) error {
+	sqliteDB, err := client.DB()
+	if err != nil {
+		return err
+	}
+
+	_, err = db.MigrateDown(sqliteDB)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func migrationUp(client *gorm.DB) error {
+	sqliteDB, err := client.DB()
+	if err != nil {
+		return err
+	}
+
+	_, err = db.MigrateUp(sqliteDB)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func checkMigrationStatus() string {
 	if len(os.Args) > 1 {
-		for _, v := range os.Args[1:] {
-			if v == "rollback" {
-				return true
-			}
+		if slices.Contains(os.Args[1:], "rollback") {
+			return "rollback"
 		}
 	}
-	return false
-}
 
-func getDBFile() string {
-	if err := godotenv.Load(); err != nil {
-		slog.Warn("No .env file found, will use default values")
-	}
-
-	dbName := os.Getenv("DB_NAME")
-	dbPath := os.Getenv("DB_PATH")
-
-	if dbName == "" {
-		dbName = "myApp.db"
-	}
-	if dbPath == "" {
-		dbPath = "."
-	}
-
-	defaultPath := filepath.Join(dbPath, dbName)
-	return defaultPath
+	return "migrate"
 }
