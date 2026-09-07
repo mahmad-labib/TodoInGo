@@ -5,11 +5,14 @@ import (
 	"os"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
+	"github.com/mahmad-labib/TodoInGo/internal/infra/db/model"
+	validation "github.com/urfave/cli-validation"
 	"github.com/urfave/cli/v3"
 )
 
 type TodoService interface {
 	Create(ctx context.Context, item *domain.Todo) (uint, error)
+	List(ctx context.Context, list *domain.List) ([]model.Todo, error)
 }
 
 type Todo struct {
@@ -49,6 +52,22 @@ func (c *Todo) Run(ctx context.Context) error {
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return c.createAction(ctx, cmd)
+				},
+			},
+			{
+				Name:  "list",
+				Usage: "get a list of todo items",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:      "sort",
+						Required:  false,
+						Usage:     "sort todo list by status,priority,created_at",
+						Validator: validation.Enum("status", "priority", "created_at"),
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					c.listAction(ctx, cmd)
+					return nil
 				},
 			},
 		},
