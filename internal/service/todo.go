@@ -8,7 +8,7 @@ import (
 
 type TodoRepository interface {
 	Create(ctx context.Context, todo *domain.Todo) (uint, error)
-	List(ctx context.Context, sort string) (*[]domain.TodoList, error)
+	List(ctx context.Context, sort string) ([]domain.TodoList, error)
 }
 
 type TodoValidator interface {
@@ -32,11 +32,11 @@ func (s *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 	return s.repo.Create(ctx, item)
 }
 
-func (s *Todo) List(ctx context.Context, sort string) (*[]domain.TodoList, error) {
+func (s *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error) {
 	sortedList, err := s.repo.List(ctx, sort)
 	if err != nil {
-		return nil, err
+		return sortedList, err
 	}
 
-	return sortedList, err
+	return sortedList, nil
 }

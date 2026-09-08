@@ -11,7 +11,7 @@ import (
 
 type TodoService interface {
 	Create(ctx context.Context, item *domain.Todo) (uint, error)
-	List(ctx context.Context, sort string) (*[]domain.TodoList, error)
+	List(ctx context.Context, sort string) ([]domain.TodoList, error)
 }
 
 type Todo struct {

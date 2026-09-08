@@ -33,19 +33,29 @@ func (r *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 	return dbTodo.ID, nil
 }
 
-func (r *Todo) List(ctx context.Context, sort string) (*[]domain.TodoList, error) {
-	var todosList *[]domain.TodoList
+func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error) {
+	var todos []model.Todo
 
 	err := r.db.
-		Table("todo").
-		Select("id", "title", "status", "priority", "created_at").
 		Order(sort).
-		Find(&todosList).
+		Find(&todos).
 		Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return todosList, nil
+	list := make([]domain.TodoList, 0, len(todos))
+
+	for _, t := range todos {
+		list = append(list, domain.TodoList{
+			ID:        t.ID,
+			Title:     t.Title,
+			Status:    t.Status,
+			Priority:  t.Priority,
+			CreatedAt: t.CreatedAt,
+		})
+	}
+
+	return list, nil
 }

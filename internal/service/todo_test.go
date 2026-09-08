@@ -122,7 +122,7 @@ func TestGetTodoList_Populated(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
-	if len(*List) == 0 {
+	if len(List) == 0 {
 		t.Fatal("expected a list got nil")
 	}
 
@@ -153,7 +153,7 @@ func TestGetTodoList_Empty(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
-	if len(*List) > 0 {
+	if len(List) > 0 {
 		t.Fatalf("expected nil got: %v", List)
 	}
 
