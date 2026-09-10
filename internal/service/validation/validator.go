@@ -24,6 +24,12 @@ func (v *Validator) Validate(item *domain.Todo) error {
 	return errors.Join(err1, err2, err3)
 }
 
+func (v *Validator) ValidateStatus(item *domain.Todo) error {
+	err := v.validateStatus(item.Status)
+
+	return err
+}
+
 func (v *Validator) validateTitle(title string) error {
 	if title == "" {
 		return fmt.Errorf("title cannot be empty")

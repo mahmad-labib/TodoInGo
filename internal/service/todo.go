@@ -9,10 +9,12 @@ import (
 type TodoRepository interface {
 	Create(ctx context.Context, todo *domain.Todo) (uint, error)
 	List(ctx context.Context, sort string) ([]domain.TodoList, error)
+	Update(ctx context.Context, todo *domain.Todo) (*domain.Todo, error)
 }
 
 type TodoValidator interface {
 	Validate(item *domain.Todo) error
+	ValidateStatus(item *domain.Todo) error
 }
 
 type Todo struct {
@@ -39,4 +41,17 @@ func (s *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	}
 
 	return sortedList, nil
+}
+
+func (s *Todo) Update(ctx context.Context, item *domain.Todo) (*domain.Todo, error) {
+	if err := s.validator.ValidateStatus(item); err != nil {
+		return item, err
+	}
+
+	item, err := s.repo.Update(ctx, item)
+	if err != nil {
+		return item, err
+	}
+
+	return item, nil
 }

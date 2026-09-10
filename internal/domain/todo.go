@@ -1,7 +1,11 @@
 package domain
 
+import "time"
+
 type Todo struct {
-	Title    string
-	Status   string
-	Priority string
+	ID        uint
+	Title     string
+	Status    string
+	Priority  string
+	CreatedAt time.Time
 }

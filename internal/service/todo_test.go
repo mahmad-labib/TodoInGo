@@ -158,3 +158,99 @@ func TestGetTodoList_Empty(t *testing.T) {
 	}
 
 }
+
+func TestTodo_Update(t *testing.T) {
+	Todo := domain.Todo{
+		Title:    "Test",
+		Priority: "high",
+		Status:   "todo",
+	}
+
+	dbClient, err := db.NewClient(&config.DB{Name: "test"})
+	if err != nil {
+		t.Fatalf("expected no error gor %v", err)
+	}
+
+	DB, err := dbClient.DB()
+	if err != nil {
+		t.Fatalf("expected no error go %v", err)
+	}
+
+	db.MigrateUp(DB)
+
+	validator := validation.New()
+	repo := db.NewTodo(dbClient)
+	service := NewTodo(repo, validator)
+
+	ctx := context.Background()
+
+	id, err := service.Create(ctx, &Todo)
+
+	if err != nil {
+		t.Fatalf("expected no error go %v", err)
+	}
+
+	if id == 0 {
+		t.Fatal("expected id got no id")
+	}
+
+	item := &domain.Todo{
+		ID:     1,
+		Status: "done",
+	}
+	todo, err := service.Update(ctx, item)
+	if err != nil {
+		t.Fatalf("expected no error go %v", err)
+	}
+	if todo.ID != 1 {
+		t.Fatalf("expected todo with id 1 got %v", todo.ID)
+	}
+	if todo.Status != "done" {
+		t.Fatalf("expected status to be done got %v", todo.Status)
+	}
+}
+
+func TestTodo_Update_InvalidID(t *testing.T) {
+	Todo := domain.Todo{
+		Title:    "Test",
+		Priority: "high",
+		Status:   "todo",
+	}
+
+	dbClient, err := db.NewClient(&config.DB{Name: "test"})
+	if err != nil {
+		t.Fatalf("expected no error gor %v", err)
+	}
+
+	DB, err := dbClient.DB()
+	if err != nil {
+		t.Fatalf("expected no error go %v", err)
+	}
+
+	db.MigrateUp(DB)
+
+	validator := validation.New()
+	repo := db.NewTodo(dbClient)
+	service := NewTodo(repo, validator)
+
+	ctx := context.Background()
+
+	id, err := service.Create(ctx, &Todo)
+
+	if err != nil {
+		t.Fatalf("expected no error go %v", err)
+	}
+
+	if id == 0 {
+		t.Fatal("expected id got no id")
+	}
+
+	item := &domain.Todo{
+		ID:     0,
+		Status: "done",
+	}
+	_, err = service.Update(ctx, item)
+	if err == nil {
+		t.Fatalf("expected error got nil")
+	}
+}

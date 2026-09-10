@@ -12,6 +12,7 @@ import (
 type TodoService interface {
 	Create(ctx context.Context, item *domain.Todo) (uint, error)
 	List(ctx context.Context, sort string) ([]domain.TodoList, error)
+	Update(ctx context.Context, item *domain.Todo) (*domain.Todo, error)
 }
 
 type Todo struct {
@@ -66,6 +67,26 @@ func (c *Todo) Run(ctx context.Context) error {
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return c.listAction(ctx, cmd)
+				},
+			},
+			{
+				Name:  "update",
+				Usage: "update an item status",
+				Flags: []cli.Flag{
+					&cli.UintFlag{
+						Name:     "id",
+						Required: true,
+						Usage:    "id of the item to update",
+					},
+					&cli.StringFlag{
+						Name:      "status",
+						Required:  true,
+						Usage:     "the new item status",
+						Validator: validation.Enum("todo", "inProgress", "done"),
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return c.updateAction(ctx, cmd)
 				},
 			},
 		},

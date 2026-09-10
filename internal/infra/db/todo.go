@@ -59,3 +59,26 @@ func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 
 	return list, nil
 }
+
+func (r *Todo) Update(ctx context.Context, item *domain.Todo) (*domain.Todo, error) {
+
+	var todo model.Todo
+	result := r.db.First(&todo, item.ID)
+	if result.Error != nil {
+		return item, result.Error
+	}
+
+	todo.Status = item.Status
+
+	result = r.db.Save(&todo)
+	if result.Error != nil {
+		return item, result.Error
+	}
+
+	item.ID = todo.ID
+	item.Title = todo.Title
+	item.Status = todo.Status
+	item.Priority = todo.Priority
+
+	return item, nil
+}
