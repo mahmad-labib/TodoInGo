@@ -10,7 +10,7 @@ import (
 	"github.com/mahmad-labib/TodoInGo/internal/service/validation"
 )
 
-func TestDBClient(t *testing.T) {
+func TestTodo_Create(t *testing.T) {
 	Todo := domain.Todo{
 		Title:    "Test",
 		Priority: "high",
@@ -27,7 +27,10 @@ func TestDBClient(t *testing.T) {
 		t.Fatalf("expected no error go %v", err)
 	}
 
-	db.MigrateUp(DB)
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
 
 	validator := validation.New()
 	repo := db.NewTodo(dbClient)
@@ -46,7 +49,7 @@ func TestDBClient(t *testing.T) {
 	}
 }
 
-func TestDBClient_TestValidation(t *testing.T) {
+func TestTodo_Create_InvalidData(t *testing.T) {
 	Todo := domain.Todo{
 		Title:    "",
 		Priority: "",
@@ -63,7 +66,10 @@ func TestDBClient_TestValidation(t *testing.T) {
 		t.Fatalf("expected no error go %v", err)
 	}
 
-	db.MigrateUp(DB)
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
 
 	validator := validation.New()
 	repo := db.NewTodo(dbClient)
@@ -82,7 +88,7 @@ func TestDBClient_TestValidation(t *testing.T) {
 	}
 }
 
-func TestGetTodoList_Populated(t *testing.T) {
+func TestTodo_List_Populated(t *testing.T) {
 	Todo := domain.Todo{
 		Title:    "Test",
 		Priority: "high",
@@ -99,7 +105,10 @@ func TestGetTodoList_Populated(t *testing.T) {
 		t.Fatalf("expected no error go %v", err)
 	}
 
-	db.MigrateUp(DB)
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
 
 	validator := validation.New()
 	repo := db.NewTodo(dbClient)
@@ -128,7 +137,7 @@ func TestGetTodoList_Populated(t *testing.T) {
 
 }
 
-func TestGetTodoList_Empty(t *testing.T) {
+func TestTodo_List_Empty(t *testing.T) {
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
 		t.Fatalf("expected no error gor %v", err)
@@ -139,7 +148,10 @@ func TestGetTodoList_Empty(t *testing.T) {
 		t.Fatalf("expected no error go %v", err)
 	}
 
-	db.MigrateUp(DB)
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
 
 	validator := validation.New()
 	repo := db.NewTodo(dbClient)
@@ -176,7 +188,10 @@ func TestTodo_Update(t *testing.T) {
 		t.Fatalf("expected no error go %v", err)
 	}
 
-	db.MigrateUp(DB)
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
 
 	validator := validation.New()
 	repo := db.NewTodo(dbClient)
@@ -195,7 +210,7 @@ func TestTodo_Update(t *testing.T) {
 	}
 
 	item := &domain.Todo{
-		ID:     1,
+		ID:     id,
 		Status: "done",
 	}
 
@@ -228,7 +243,10 @@ func TestTodo_Update_InvalidID(t *testing.T) {
 		t.Fatalf("expected no error go %v", err)
 	}
 
-	db.MigrateUp(DB)
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
 
 	validator := validation.New()
 	repo := db.NewTodo(dbClient)
