@@ -24,7 +24,7 @@ func (r *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 		Priority: item.Priority,
 	}
 
-	result := r.db.Create(&dbTodo)
+	result := r.db.WithContext(ctx).Create(&dbTodo)
 	if result.Error != nil {
 		err := fmt.Errorf("failed to create new todo with err: %w", result.Error)
 		return 0, err
@@ -37,6 +37,7 @@ func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	var todos []model.Todo
 
 	err := r.db.
+		WithContext(ctx).
 		Order(sort).
 		Find(&todos).
 		Error
@@ -63,14 +64,14 @@ func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 func (r *Todo) Update(ctx context.Context, item *domain.Todo) (*domain.Todo, error) {
 
 	var todo model.Todo
-	result := r.db.First(&todo, item.ID)
+	result := r.db.WithContext(ctx).First(&todo, item.ID)
 	if result.Error != nil {
 		return item, result.Error
 	}
 
 	todo.Status = item.Status
 
-	result = r.db.Save(&todo)
+	result = r.db.WithContext(ctx).Save(&todo)
 	if result.Error != nil {
 		return item, result.Error
 	}

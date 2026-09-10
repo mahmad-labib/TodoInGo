@@ -89,7 +89,7 @@ func TestServiceTodo_Update_InavalidStatus(t *testing.T) {
 		Status: "Invalid",
 	}
 
-	err := New().ValidateStatus(&Item)
+	err := New().ValidateStatus(Item.Status)
 	if err == nil {
 		t.Fatalf("expected error, got no error")
 	}

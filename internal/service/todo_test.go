@@ -117,7 +117,7 @@ func TestGetTodoList_Populated(t *testing.T) {
 		t.Fatal("expected id got no id")
 	}
 
-	sort := "title"
+	sort := "status"
 	List, err := service.List(ctx, sort)
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -147,7 +147,7 @@ func TestGetTodoList_Empty(t *testing.T) {
 
 	ctx := context.Background()
 
-	sort := "title"
+	sort := "status"
 	List, err := service.List(ctx, sort)
 
 	if err != nil {
@@ -198,6 +198,7 @@ func TestTodo_Update(t *testing.T) {
 		ID:     1,
 		Status: "done",
 	}
+
 	todo, err := service.Update(ctx, item)
 	if err != nil {
 		t.Fatalf("expected no error go %v", err)
@@ -249,6 +250,7 @@ func TestTodo_Update_InvalidID(t *testing.T) {
 		ID:     0,
 		Status: "done",
 	}
+
 	_, err = service.Update(ctx, item)
 	if err == nil {
 		t.Fatalf("expected error got nil")
