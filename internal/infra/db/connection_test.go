@@ -11,9 +11,11 @@ import (
 func TestNewClient_Success(t *testing.T) {
 	// Use in-memory SQLite for tests
 	client, err := db.NewClient(&config.DB{Name: "test"})
+
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
+
 	if client == nil {
 		t.Fatal("expected DB instance to not be nil")
 	}
@@ -21,6 +23,7 @@ func TestNewClient_Success(t *testing.T) {
 
 func TestNewClient_EmptyDSN(t *testing.T) {
 	client, err := db.NewClient(&config.DB{})
+
 	if err == nil {
 		t.Fatal("expected error for empty dsn, got nil")
 	}
