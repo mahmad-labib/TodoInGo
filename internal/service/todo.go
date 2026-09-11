@@ -9,7 +9,8 @@ import (
 type TodoRepository interface {
 	Create(ctx context.Context, todo *domain.Todo) (uint, error)
 	List(ctx context.Context, sort string) ([]domain.TodoList, error)
-	Update(ctx context.Context, todo *domain.Todo) (*domain.Todo, error)
+	UpdateStatus(ctx context.Context, todo *domain.Todo) error
+	FindByID(ctx context.Context, id uint) (*domain.Todo, error)
 }
 
 type TodoValidator interface {
@@ -49,15 +50,20 @@ func (s *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	return sortedList, nil
 }
 
-func (s *Todo) Update(ctx context.Context, item *domain.Todo) (*domain.Todo, error) {
+func (s *Todo) UpdateStatus(ctx context.Context, item *domain.Todo) (*domain.Todo, error) {
 	if err := s.validator.ValidateStatus(item.Status); err != nil {
 		return item, err
 	}
 
-	item, err := s.repo.Update(ctx, item)
+	err := s.repo.UpdateStatus(ctx, item)
 	if err != nil {
 		return item, err
 	}
 
-	return item, nil
+	updatedItem, err := s.repo.FindByID(ctx, item.ID)
+	if err != nil {
+		return updatedItem, err
+	}
+
+	return updatedItem, nil
 }

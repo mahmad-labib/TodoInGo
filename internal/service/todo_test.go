@@ -214,7 +214,7 @@ func TestTodo_Update(t *testing.T) {
 		Status: "done",
 	}
 
-	todo, err := service.Update(ctx, item)
+	todo, err := service.UpdateStatus(ctx, item)
 	if err != nil {
 		t.Fatalf("expected no error go %v", err)
 	}
@@ -269,7 +269,7 @@ func TestTodo_Update_InvalidID(t *testing.T) {
 		Status: "done",
 	}
 
-	_, err = service.Update(ctx, item)
+	_, err = service.UpdateStatus(ctx, item)
 	if err == nil {
 		t.Fatalf("expected error got nil")
 	}

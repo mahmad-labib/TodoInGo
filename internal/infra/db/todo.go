@@ -61,25 +61,33 @@ func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	return list, nil
 }
 
-func (r *Todo) Update(ctx context.Context, item *domain.Todo) (*domain.Todo, error) {
+func (r *Todo) UpdateStatus(ctx context.Context, item *domain.Todo) error {
+	res := r.db.WithContext(ctx).Model(&model.Todo{}).Where("id = ?", item.ID).Update("status", item.Status)
 
+	if res.Error != nil {
+		return fmt.Errorf("error when update todo id=%d: %w", item.ID, res.Error)
+	}
+
+	if res.RowsAffected == 0 {
+		return fmt.Errorf("todo: id=%d: is not exist", item.ID)
+	}
+
+	return nil
+}
+
+func (r *Todo) FindByID(ctx context.Context, id uint) (*domain.Todo, error) {
 	var todo model.Todo
-	result := r.db.WithContext(ctx).First(&todo, item.ID)
-	if result.Error != nil {
-		return item, result.Error
+	err := r.db.First(&todo, id).Error
+	if err != nil {
+		return nil, err
 	}
 
-	todo.Status = item.Status
-
-	result = r.db.WithContext(ctx).Save(&todo)
-	if result.Error != nil {
-		return item, result.Error
+	var item = domain.Todo{
+		ID:       todo.ID,
+		Title:    todo.Title,
+		Status:   todo.Status,
+		Priority: todo.Priority,
 	}
 
-	item.ID = todo.ID
-	item.Title = todo.Title
-	item.Status = todo.Status
-	item.Priority = todo.Priority
-
-	return item, nil
+	return &item, nil
 }
