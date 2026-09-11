@@ -24,7 +24,7 @@ func (r *Todo) Create(ctx context.Context, item *domain.Todo) (uint, error) {
 		Priority: item.Priority,
 	}
 
-	result := r.db.Create(&dbTodo)
+	result := r.db.WithContext(ctx).Create(&dbTodo)
 	if result.Error != nil {
 		err := fmt.Errorf("failed to create new todo with err: %w", result.Error)
 		return 0, err
@@ -37,6 +37,7 @@ func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	var todos []model.Todo
 
 	err := r.db.
+		WithContext(ctx).
 		Order(sort).
 		Find(&todos).
 		Error
@@ -58,4 +59,35 @@ func (r *Todo) List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	}
 
 	return list, nil
+}
+
+func (r *Todo) UpdateStatus(ctx context.Context, item *domain.Todo) error {
+	res := r.db.WithContext(ctx).Model(&model.Todo{}).Where("id = ?", item.ID).Update("status", item.Status)
+
+	if res.Error != nil {
+		return fmt.Errorf("error when update todo id=%d: %w", item.ID, res.Error)
+	}
+
+	if res.RowsAffected == 0 {
+		return fmt.Errorf("todo: id=%d: is not exist", item.ID)
+	}
+
+	return nil
+}
+
+func (r *Todo) FindByID(ctx context.Context, id uint) (*domain.Todo, error) {
+	var todo model.Todo
+	err := r.db.First(&todo, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var item = domain.Todo{
+		ID:       todo.ID,
+		Title:    todo.Title,
+		Status:   todo.Status,
+		Priority: todo.Priority,
+	}
+
+	return &item, nil
 }

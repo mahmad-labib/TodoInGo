@@ -11,13 +11,13 @@ import (
 )
 
 func NewClient(cfg *config.DB) (*gorm.DB, error) {
-	dns := resolveFilePath(cfg)
+	dsn := resolveFilePath(cfg)
 
-	if dns == "" {
+	if dsn == "" {
 		return nil, errors.New("DSN cannot be empty")
 	}
 
-	db, err := gorm.Open(sqlite.Open(dns), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("open database : %w", err)
 	}

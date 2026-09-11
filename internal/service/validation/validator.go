@@ -17,7 +17,7 @@ func New() *Validator {
 func (v *Validator) Validate(item *domain.Todo) error {
 	err1 := v.validateTitle(item.Title)
 
-	err2 := v.validateStatus(item.Status)
+	err2 := v.ValidateStatus(item.Status)
 
 	err3 := v.validatePriority(item.Priority)
 
@@ -36,7 +36,7 @@ func (v *Validator) validateTitle(title string) error {
 	return nil
 }
 
-func (v *Validator) validateStatus(status string) error {
+func (v *Validator) ValidateStatus(status string) error {
 	statuses := []string{"todo", "inProgress", "done"}
 
 	if status == "" {
@@ -61,4 +61,19 @@ func (v *Validator) validatePriority(priority string) error {
 	}
 
 	return fmt.Errorf("priority should be high, normal or low")
+}
+
+func (v *Validator) ValidateSort(sort *string) error {
+	sortList := []string{"status", "created_at", "priority"}
+
+	if *sort == "" {
+		*sort = "created_at"
+	}
+
+	if slices.Contains(sortList, *sort) {
+		return nil
+	}
+
+	return fmt.Errorf("sort should be status, created_at, priority")
+
 }

@@ -83,3 +83,14 @@ func TestServiceTodo_InavalidStatus(t *testing.T) {
 		t.Fatalf("expected error, got no error")
 	}
 }
+
+func TestServiceTodo_Update_InavalidStatus(t *testing.T) {
+	Item := domain.Todo{
+		Status: "Invalid",
+	}
+
+	err := New().ValidateStatus(Item.Status)
+	if err == nil {
+		t.Fatalf("expected error, got no error")
+	}
+}
