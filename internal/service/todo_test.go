@@ -19,12 +19,12 @@ func TestTodo_Create(t *testing.T) {
 
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
-		t.Fatalf("expected no error gor %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	DB, err := dbClient.DB()
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	_, err = db.MigrateUp(DB)
@@ -41,7 +41,7 @@ func TestTodo_Create(t *testing.T) {
 	id, err := service.Create(ctx, &Todo)
 
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	if id == 0 {
@@ -58,12 +58,12 @@ func TestTodo_Create_InvalidData(t *testing.T) {
 
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
-		t.Fatalf("expected no error gor %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	DB, err := dbClient.DB()
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	_, err = db.MigrateUp(DB)
@@ -97,12 +97,12 @@ func TestTodo_List_Populated(t *testing.T) {
 
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
-		t.Fatalf("expected no error gor %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	DB, err := dbClient.DB()
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	_, err = db.MigrateUp(DB)
@@ -119,7 +119,7 @@ func TestTodo_List_Populated(t *testing.T) {
 	id, err := service.Create(ctx, &Todo)
 
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	if id == 0 {
@@ -140,12 +140,12 @@ func TestTodo_List_Populated(t *testing.T) {
 func TestTodo_List_Empty(t *testing.T) {
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
-		t.Fatalf("expected no error gor %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	DB, err := dbClient.DB()
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	_, err = db.MigrateUp(DB)
@@ -180,12 +180,12 @@ func TestTodo_Update(t *testing.T) {
 
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
-		t.Fatalf("expected no error gor %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	DB, err := dbClient.DB()
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	_, err = db.MigrateUp(DB)
@@ -202,7 +202,7 @@ func TestTodo_Update(t *testing.T) {
 	id, err := service.Create(ctx, &Todo)
 
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	if id == 0 {
@@ -235,12 +235,12 @@ func TestTodo_Update_InvalidID(t *testing.T) {
 
 	dbClient, err := db.NewClient(&config.DB{Name: "test"})
 	if err != nil {
-		t.Fatalf("expected no error gor %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	DB, err := dbClient.DB()
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	_, err = db.MigrateUp(DB)
@@ -257,7 +257,7 @@ func TestTodo_Update_InvalidID(t *testing.T) {
 	id, err := service.Create(ctx, &Todo)
 
 	if err != nil {
-		t.Fatalf("expected no error go %v", err)
+		t.Fatalf("expected no error got %v", err)
 	}
 
 	if id == 0 {
@@ -273,4 +273,104 @@ func TestTodo_Update_InvalidID(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error got nil")
 	}
+}
+
+func TestTodo_Delete(t *testing.T) {
+	Todo := domain.Todo{
+		Title:    "Test",
+		Priority: "high",
+		Status:   "todo",
+	}
+
+	dbClient, err := db.NewClient(&config.DB{Name: "test"})
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	DB, err := dbClient.DB()
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
+
+	validator := validation.New()
+	repo := db.NewTodo(dbClient)
+	service := NewTodo(repo, validator)
+
+	ctx := context.Background()
+
+	id, err := service.Create(ctx, &Todo)
+
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	if id == 0 {
+		t.Fatal("expected id got no id")
+	}
+
+	err = service.Delete(ctx, id)
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	_, err = service.repo.FindByID(ctx, id)
+	if err == nil {
+		t.Fatalf("expected error got nil")
+	}
+
+}
+
+func TestTodo_Delete_InvalidID(t *testing.T) {
+	Todo := domain.Todo{
+		Title:    "Test",
+		Priority: "high",
+		Status:   "todo",
+	}
+
+	dbClient, err := db.NewClient(&config.DB{Name: "test"})
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	DB, err := dbClient.DB()
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	_, err = db.MigrateUp(DB)
+	if err != nil {
+		t.Fatalf("migration failed: %v", err)
+	}
+
+	validator := validation.New()
+	repo := db.NewTodo(dbClient)
+	service := NewTodo(repo, validator)
+
+	ctx := context.Background()
+
+	id, err := service.Create(ctx, &Todo)
+
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
+	if id == 0 {
+		t.Fatal("expected id got no id")
+	}
+
+	err = service.Delete(ctx, 0)
+	if err == nil {
+		t.Fatalf("expected error got nil")
+	}
+
+	_, err = service.repo.FindByID(ctx, id)
+	if err != nil {
+		t.Fatalf("expected no error got %v", err)
+	}
+
 }

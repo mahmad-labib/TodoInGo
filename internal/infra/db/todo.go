@@ -91,3 +91,16 @@ func (r *Todo) FindByID(ctx context.Context, id uint) (*domain.Todo, error) {
 
 	return &item, nil
 }
+
+func (r *Todo) Delete(ctx context.Context, id uint) error {
+	res := r.db.Delete(&model.Todo{}, id)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}

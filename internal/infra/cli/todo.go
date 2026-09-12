@@ -13,6 +13,7 @@ type TodoService interface {
 	Create(ctx context.Context, item *domain.Todo) (uint, error)
 	List(ctx context.Context, sort string) ([]domain.TodoList, error)
 	UpdateStatus(ctx context.Context, item *domain.Todo) (*domain.Todo, error)
+	Delete(ctx context.Context, id uint) error
 }
 
 type Todo struct {
@@ -87,6 +88,20 @@ func (c *Todo) Run(ctx context.Context) error {
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return c.updateAction(ctx, cmd)
+				},
+			},
+			{
+				Name:  "delete",
+				Usage: "delete an item",
+				Flags: []cli.Flag{
+					&cli.UintFlag{
+						Name:     "id",
+						Required: true,
+						Usage:    "id of the item to delete",
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return c.deleteAction(ctx, cmd)
 				},
 			},
 		},
