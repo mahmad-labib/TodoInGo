@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,11 +12,20 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/mahmad-labib/TodoInGo/http/router"
+	"github.com/mahmad-labib/TodoInGo/internal/config"
+	"github.com/mahmad-labib/TodoInGo/internal/infra/db"
+	"github.com/mahmad-labib/TodoInGo/internal/service"
+	"github.com/mahmad-labib/TodoInGo/internal/service/validation"
 )
 
-func main() {
-	r := chi.NewRouter()
+type Router struct{}
 
+func main() {
+
+	service := initiateService()
+
+	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
@@ -25,6 +35,9 @@ func main() {
 		Addr:    ":8080",
 		Handler: r,
 	}
+
+	ctx := context.Background()
+	r.Mount("/todo", router.NewTodoRouter(ctx, service))
 
 	done := make(chan struct{})
 
@@ -52,4 +65,27 @@ func main() {
 
 	<-done
 	fmt.Println("Server exited cleanly")
+}
+
+func initiateService() *service.Todo {
+	cfg, err := config.New()
+	if err != nil {
+		slog.Error(fmt.Sprintf("Failed to load config %v", err))
+
+		os.Exit(1)
+	}
+
+	dbClient, err := db.NewClient(&cfg.DB)
+	if err != nil {
+		slog.Error(fmt.Sprintf("couldn't establish connection %v", err))
+
+		os.Exit(1)
+	}
+
+	repo := db.NewTodo(dbClient)
+
+	validator := validation.New()
+
+	service := service.NewTodo(repo, validator)
+	return service
 }
