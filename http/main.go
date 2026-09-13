@@ -36,8 +36,7 @@ func main() {
 		Handler: r,
 	}
 
-	ctx := context.Background()
-	r.Mount("/todo", router.NewTodoRouter(ctx, service))
+	r.Mount("/v1", router.NewTodoRouter(service))
 
 	done := make(chan struct{})
 
