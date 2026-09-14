@@ -9,6 +9,10 @@ import (
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
 )
 
+type UpdateStatus struct {
+	Status string `json:"status"`
+}
+
 func (h *TodoHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	var body UpdateStatus
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {

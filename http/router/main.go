@@ -29,16 +29,6 @@ type ErrorResponse struct {
 	Details []string `json:"details"`
 }
 
-type UpdateStatus struct {
-	Status string `json:"status"`
-}
-
-type CreateTodoRequest struct {
-	Title    string `json:"title"`
-	Priority string `json:"priority"`
-	Status   string `json:"status"`
-}
-
 type TodoHandler struct {
 	svc TodoService
 }
