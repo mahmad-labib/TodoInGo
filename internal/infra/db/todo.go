@@ -65,11 +65,30 @@ func (r *Todo) UpdateStatus(ctx context.Context, item *domain.Todo) error {
 	res := r.db.WithContext(ctx).Model(&model.Todo{}).Where("id = ?", item.ID).Update("status", item.Status)
 
 	if res.Error != nil {
-		return fmt.Errorf("error when update todo id=%d: %w", item.ID, res.Error)
+		return fmt.Errorf("error when update todo with id=%d: %w", item.ID, res.Error)
 	}
 
 	if res.RowsAffected == 0 {
-		return fmt.Errorf("todo: id=%d: is not exist", item.ID)
+		return fmt.Errorf("todo: id=%d: does not exist", item.ID)
+	}
+
+	return nil
+}
+
+func (r *Todo) Update(ctx context.Context, item *domain.Todo) error {
+	todo := model.Todo{
+		Title:    item.Title,
+		Priority: item.Priority,
+		Status:   item.Status,
+	}
+	res := r.db.WithContext(ctx).Model(&model.Todo{}).Where("id = ?", item.ID).Updates(todo)
+
+	if res.Error != nil {
+		return fmt.Errorf("error when update todo with id=%d: %w", item.ID, res.Error)
+	}
+
+	if res.RowsAffected == 0 {
+		return fmt.Errorf("todo: id=%d: does not exist", item.ID)
 	}
 
 	return nil

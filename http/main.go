@@ -19,8 +19,6 @@ import (
 	"github.com/mahmad-labib/TodoInGo/internal/service/validation"
 )
 
-type Router struct{}
-
 func main() {
 
 	service := initiateService()
@@ -40,7 +38,7 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	r.Mount("/v1", router.NewTodoRouter(service))
+	r.Mount("/", router.NewTodoRouter(service))
 
 	done := make(chan struct{})
 

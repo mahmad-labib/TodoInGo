@@ -12,6 +12,7 @@ type TodoRepository interface {
 	UpdateStatus(ctx context.Context, todo *domain.Todo) error
 	FindByID(ctx context.Context, id uint) (*domain.Todo, error)
 	Delete(ctx context.Context, id uint) error
+	Update(ctx context.Context, item *domain.Todo) error
 }
 
 type TodoValidator interface {
@@ -71,6 +72,33 @@ func (s *Todo) UpdateStatus(ctx context.Context, item *domain.Todo) (*domain.Tod
 
 func (s *Todo) Delete(ctx context.Context, id uint) error {
 	if err := s.repo.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Todo) FindByID(ctx context.Context, id uint) (*domain.Todo, error) {
+	updatedItem, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return updatedItem, err
+	}
+
+	return updatedItem, nil
+}
+
+func (s *Todo) Update(ctx context.Context, item *domain.Todo) error {
+	if err := s.validator.Validate(item); err != nil {
+		return err
+	}
+
+	err := s.repo.UpdateStatus(ctx, item)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.Update(ctx, item)
+	if err != nil {
 		return err
 	}
 
