@@ -2,13 +2,22 @@ package validation
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 
 	"github.com/mahmad-labib/TodoInGo/internal/domain"
 )
 
 type Validator struct{}
+
+var (
+	ErrInvalidTitle    = errors.New("title is required")
+	ErrTitleLength     = errors.New("title cannot be longer than 50 characters")
+	ErrInvalidPriority = errors.New("priority cant be empty, value should be high, normal or low")
+	ErrPriorityLength  = errors.New(("priority cant be empty, value should be high, normal or low"))
+	ErrInvalidStatus   = errors.New("status value should be todo, inProgress or done")
+	ErrStatusLength    = errors.New("status cannot be empty")
+	ErrInvalidSort     = errors.New("sort should be status, created_at, priority")
+)
 
 func New() *Validator {
 	return &Validator{}
@@ -26,11 +35,11 @@ func (v *Validator) Validate(item *domain.Todo) error {
 
 func (v *Validator) validateTitle(title string) error {
 	if title == "" {
-		return fmt.Errorf("title cannot be empty")
+		return ErrInvalidTitle
 	}
 
 	if len(title) > 50 {
-		return fmt.Errorf("title cannot be longer than 50 characters")
+		return ErrTitleLength
 	}
 
 	return nil
@@ -40,11 +49,11 @@ func (v *Validator) ValidateStatus(status string) error {
 	statuses := []string{"todo", "inProgress", "done"}
 
 	if status == "" {
-		return fmt.Errorf("status cannot be empty")
+		return ErrStatusLength
 	}
 
 	if !slices.Contains(statuses, status) {
-		return fmt.Errorf("status value should be todo, inProgress or done")
+		return ErrInvalidStatus
 	}
 
 	return nil
@@ -53,14 +62,14 @@ func (v *Validator) validatePriority(priority string) error {
 	priorities := []string{"high", "normal", "low"}
 
 	if priority == "" {
-		return fmt.Errorf("priority cant be empty, value should be high, normal or low")
+		return ErrPriorityLength
 	}
 
 	if slices.Contains(priorities, priority) {
 		return nil
 	}
 
-	return fmt.Errorf("priority should be high, normal or low")
+	return ErrInvalidPriority
 }
 
 func (v *Validator) ValidateSort(sort *string) error {
@@ -74,6 +83,6 @@ func (v *Validator) ValidateSort(sort *string) error {
 		return nil
 	}
 
-	return fmt.Errorf("sort should be status, created_at, priority")
+	return ErrInvalidSort
 
 }
